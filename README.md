@@ -1,5 +1,7 @@
-Welcome to my Todo List API all documentation will go here
-Link for API coming soon!!
+Welcome to my Todo List API all documentation will go here. This is a personal project that I have created to brush up on my restful API. I will be connecting this to a front-end stay tunned for that
+
+Link to the API is right here!!
+https://jonstodoapp.herokuapp.com/
 
 | Main actions        | URL            | Method |
 | :------------------ | :------------- | :----- |
