@@ -38,3 +38,35 @@ You can see original commits here https://github.com/jonathan-portillo/TODO/tree
 | Create a description for a todo using the todo list id | /description/:id/list | POST   |
 | Update a description using its id                      | /description/:id      | PUT    |
 | Delete a description                                   | /description/:id      | DELETE |
+
+## Username Registration
+
+| PROPERTY | TYPE   | EXAMPLE           | Notes    |
+| :------- | :----- | :---------------- | :------- |
+| username | string | "user1"           | required |
+| password | string | "thisisapassword" | required |
+
+## Username Login
+
+| PROPERTY | TYPE   | EXAMPLE           | Notes    |
+| :------- | :----- | :---------------- | :------- |
+| Title    | string | "user1"           | required |
+| password | string | "thisisapassword" | required |
+
+## Todo Title
+
+| PROPERTY   | TYPE   | EXAMPLE    | Notes    |
+| :--------- | :----- | :--------- | :------- |
+| todo_title | string | "Comp Sci" | required |
+
+## Todo List
+
+| PROPERTY  | TYPE   | EXAMPLE  | Notes    |
+| :-------- | :----- | :------- | :------- |
+| todo_list | string | "Python" | required |
+
+## Description
+
+| PROPERTY    | TYPE   | EXAMPLE        | Notes    |
+| :---------- | :----- | :------------- | :------- |
+| description | string | "Binary Trees" | required |
