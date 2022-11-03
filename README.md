@@ -2,7 +2,7 @@ Welcome to my Todo List API all documentation will go here. This is a personal p
 
 ## STATUS
 
-Added validation middleware to API, some of the endpoints require refactoring for easier understading and less confusion. Seeds and Testing coming soon!!!
+## Added validation middleware to API, some of the endpoints require refactoring for easier understading and less confusion. Seeds and Testing coming soon!!!
 
 Please make sure you read though all of the documentation!!
 
