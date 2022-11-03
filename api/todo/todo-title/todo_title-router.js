@@ -1,5 +1,9 @@
 const router = require("express").Router();
 const title = require("./todo_title-model");
+const {
+  validateTitleID,
+  validateTitle,
+} = require("../../../middleware/title-middleware");
 
 //get every single todo title created!!
 router.get("/", (req, res) => {
@@ -28,7 +32,7 @@ router.get("/user/:id", (req, res) => {
 });
 
 //get todo based on titleid
-router.get("/:id", (req, res) => {
+router.get("/:id", validateTitleID, (req, res) => {
   const titleId = req.params.id;
   title
     .findTitleById(titleId)
@@ -41,7 +45,7 @@ router.get("/:id", (req, res) => {
 });
 
 //create a todo list that is tied to the user_id
-router.post("/user/:id/", (req, res) => {
+router.post("/user/:id/", validateTitle, (req, res) => {
   const newTodoTitle = {
     user_id: req.params.id,
     todo_title: req.body.todo_title,
@@ -59,7 +63,7 @@ router.post("/user/:id/", (req, res) => {
 
 //update the todo list title
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validateTitleID, validateTitle, (req, res) => {
   const updatedTitle = {
     todo_title: req.body.todo_title,
   };
@@ -78,7 +82,7 @@ router.put("/:id", (req, res) => {
 });
 
 //delete the todo list
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validateTitleID, (req, res) => {
   title.deleteTodoList(req.params.id).then(() => {
     res.status(200).json({ message: "Todo List deleted!!!" });
   });
