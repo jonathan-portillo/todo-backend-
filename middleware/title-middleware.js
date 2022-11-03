@@ -1,5 +1,10 @@
 const title = require("../api/todo/todo-title/todo_title-model");
 
+module.exports = {
+  validateTitleID,
+  validateTitle,
+};
+
 function validateTitleID(req, res, next) {
   const { id } = req.params.id;
 
@@ -17,4 +22,12 @@ function validateTitleID(req, res, next) {
     .catch((err) => {
       consolelog("Error getting id", err);
     });
+}
+
+function validateTitle(req, res, next) {
+  if (!req.body.todo_title) {
+    res.status(400).json({ message: "You did not add a title" });
+  } else {
+    next();
+  }
 }
