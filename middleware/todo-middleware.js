@@ -24,7 +24,7 @@ function validateTodoID(req, res, next) {
 
 function validateTodo(req, res, next) {
   if (!req.body.todo_list) {
-    res.status(400).json({ message: "You did not add a todo" });
+    res.status(400).json({ message: "Todo not found!" });
   } else {
     next();
   }
