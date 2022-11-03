@@ -3,6 +3,7 @@ const description = require("../api/todo/description/description-model");
 module.exports = {
   validateDescription,
   validateDescriptionID,
+  validateDescriptionsForTodo,
 };
 
 function validateDescription(req, res, next) {
@@ -30,4 +31,17 @@ function validateDescriptionID(req, res, next) {
     .catch((err) => {
       console.log("Error getting id", err);
     });
+}
+
+async function validateDescriptionsForTodo(req, res, next) {
+  const { id } = req.params;
+
+  const descriptions = await description.findDescriptionByList(id);
+
+  if (descriptions.length === 0) {
+    res.status(404).json("Theres no description lets add one!!");
+    console.log(descriptions);
+  } else {
+    next();
+  }
 }
