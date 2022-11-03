@@ -6,7 +6,7 @@ module.exports = {
 };
 
 function validateTitleID(req, res, next) {
-  const { id } = req.params.id;
+  const { id } = req.params;
 
   title
     .findTitleById(id)
@@ -20,7 +20,7 @@ function validateTitleID(req, res, next) {
       }
     })
     .catch((err) => {
-      consolelog("Error getting id", err);
+      console.log("Error getting id", err);
     });
 }
 
