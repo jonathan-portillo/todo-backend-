@@ -3,6 +3,7 @@ const todoList = require("./todo_list_model");
 const {
   validateTodoID,
   validateTodo,
+  validateTodoInList,
 } = require("../../../middleware/todo-middleware");
 const { validateTitleID } = require("../../../middleware/title-middleware");
 
@@ -33,7 +34,7 @@ router.get("/:id", validateTodoID, (req, res) => {
 });
 
 //list of todo's based on titleid
-router.get("/:id/title", validateTitleID, (req, res) => {
+router.get("/:id/title", validateTitleID, validateTodoInList, (req, res) => {
   todoList
     .findTodoListByTitleId(req.params.id)
     .then((title) => {
