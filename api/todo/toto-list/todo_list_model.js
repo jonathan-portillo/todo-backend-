@@ -32,15 +32,18 @@ async function findTodoListByTitleId(id) {
   }
 }
 
+//create a new todo
 async function addTodoList(newTodoList) {
   const [id] = await db("todo_list").insert(newTodoList, "id");
   return findTodoListById(id);
 }
 
+//update todo
 function updateTodoList(changes, id) {
   return db("todo_list").where({ id }).update(changes);
 }
 
+//delete todo
 function deleteTodo(id) {
   return db("todo_list").del().where({ id });
 }

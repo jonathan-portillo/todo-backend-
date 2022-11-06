@@ -6,6 +6,7 @@ module.exports = {
   validateDescriptionsForTodo,
 };
 
+//ensure that there is a description being posted when submiting the POST request
 function validateDescription(req, res, next) {
   if (!req.body.description) {
     res.status(400).json({ message: "Descrition not added!" });
@@ -14,6 +15,7 @@ function validateDescription(req, res, next) {
   }
 }
 
+//ensuring that the endpoints is using an existing description id
 function validateDescriptionID(req, res, next) {
   const { id } = req.params;
 
@@ -33,6 +35,7 @@ function validateDescriptionID(req, res, next) {
     });
 }
 
+//checks to see if there are descriptions added to a todo, if not it shoots out "There is no description lets add one."
 async function validateDescriptionsForTodo(req, res, next) {
   const { id } = req.params;
 

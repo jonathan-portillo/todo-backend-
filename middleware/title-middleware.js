@@ -5,6 +5,7 @@ module.exports = {
   validateTitle,
 };
 
+//ensuring that endpoints have an existing title id
 function validateTitleID(req, res, next) {
   const { id } = req.params;
 
@@ -24,6 +25,7 @@ function validateTitleID(req, res, next) {
     });
 }
 
+//ensuring that end points are posting the proper json information for the title
 function validateTitle(req, res, next) {
   if (!req.body.todo_title) {
     res.status(400).json({ message: "You did not add a title" });

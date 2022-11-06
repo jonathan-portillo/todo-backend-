@@ -14,6 +14,7 @@ function find() {
   return db("description");
 }
 
+//find a description based on its todo list id
 async function findDescriptionByList(id) {
   try {
     const description = await db("description as d")

@@ -6,6 +6,7 @@ module.exports = {
   validateTodoInList,
 };
 
+//ensuring that end points have an existing todo id
 function validateTodoID(req, res, next) {
   const { id } = req.params;
 
@@ -23,6 +24,7 @@ function validateTodoID(req, res, next) {
     });
 }
 
+//ensuring that when posting there is a valid todo
 function validateTodo(req, res, next) {
   if (!req.body.todo_list) {
     res.status(400).json({ message: "Todo not found!" });
@@ -31,6 +33,7 @@ function validateTodo(req, res, next) {
   }
 }
 
+//checks to see if the todo title has a todo added onto it. if an empty array it spits out "There is nothing here!"
 async function validateTodoInList(req, res, next) {
   const { id } = req.params;
 
