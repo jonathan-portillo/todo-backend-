@@ -4,6 +4,8 @@ Welcome to my Todo List API all documentation will go here. This is a personal p
 
 ## Added validation middleware to API, some of the endpoints require refactoring for easier understading and less confusion. Seeds and Testing coming soon!!!
 
+## 11/11 Testing files created. Still need to refactor endpoints and update documentation. Also fixed small typo in description documentation
+
 Please make sure you read though all of the documentation!!
 
 Link to the API is right here!!
@@ -39,7 +41,7 @@ You can see original commits here https://github.com/jonathan-portillo/TODO/tree
 | Description actions                                    | URL                   | Method |
 | :----------------------------------------------------- | :-------------------- | :----- |
 | Find all descriptions                                  | /description          | GET    |
-| Find a description of a todo based on its todo list id | /descritpion/:id/list | GET    |
+| Find a description of a todo based on its todo list id | /description/:id/list | GET    |
 | Find a discription based on its id                     | /description/:id      | GET    |
 | Create a description for a todo using the todo list id | /description/:id/list | POST   |
 | Update a description using its id                      | /description/:id      | PUT    |
