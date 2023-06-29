@@ -1,5 +1,6 @@
 const express = require("express");
 const server = express();
+const cors = require("cors");
 
 const usersRouter = require("./users/users-router");
 const authRouter = require("../auth/auth-router");
@@ -8,6 +9,7 @@ const todoListRouter = require("../api/todo/toto-list/todo_list_router");
 const descriptionRouter = require("../api/todo/description/description-router");
 
 server.use(express.json());
+server.use(cors());
 
 server.use("/auth", authRouter);
 server.use("/users", usersRouter);
