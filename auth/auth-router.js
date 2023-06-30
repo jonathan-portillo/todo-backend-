@@ -16,7 +16,7 @@ router.post("/register", async (req, res, next) => {
       cred.password = hash;
       const user = await users.add(cred);
       const token = generateToken(user);
-      res.status(201).json({ data: `id ${user.id}`, cred, token });
+      res.status(201).json({ id: `${user.id}`, cred, token });
     } else {
       res.status(400).json({ message: "username or password is missing" });
     }
