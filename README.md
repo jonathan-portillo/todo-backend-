@@ -2,7 +2,9 @@ Welcome to my Todo List API all documentation will go here. This is a personal p
 
 ## STATUS
 
-## 6/28/23 Added cors to help connect frontend to API.
+## 6/29/23 Fixed issue with id on authentication
+
+## Added cors to help connect frontend to API.
 
 ## Added validation middleware to API, some of the endpoints require refactoring for easier understading and less confusion. Seeds and Testing coming soon!!!
 
