@@ -8,6 +8,11 @@ module.exports = {
   addTitle,
   updateTitle,
   deleteTodoList,
+  findTrashByUser,
+  trashTitle,
+  restoreTitle,
+  moveTitle,
+  moveToBoard,
 };
 
 //find all Note Titles
@@ -26,11 +31,62 @@ async function findTitleByUser(id) {
     const title = await db("todo_title as tt")
       .join("users as u", "u.id", "tt.user_id")
       .where({ "tt.user_id": id })
-      .select("tt.id", "u.username", "tt.todo_title", "tt.user_id");
+      .whereNull("tt.deleted_at")
+      .select(
+        "tt.id",
+        "u.username",
+        "tt.todo_title",
+        "tt.user_id",
+        "tt.pos_x",
+        "tt.pos_y",
+        "tt.board_id"
+      );
     return title;
   } catch (err) {
     throw err;
   }
+}
+
+//find the trashed todo titles for a user, most recently deleted first
+function findTrashByUser(id) {
+  return db("todo_title as tt")
+    .join("users as u", "u.id", "tt.user_id")
+    .where({ "tt.user_id": id })
+    .whereNotNull("tt.deleted_at")
+    .orderBy("tt.deleted_at", "desc")
+    .select(
+      "tt.id",
+      "u.username",
+      "tt.todo_title",
+      "tt.user_id",
+      "tt.deleted_at"
+    );
+}
+
+//move a todo title to the trash
+function trashTitle(id) {
+  return db("todo_title").where({ id }).update({ deleted_at: db.fn.now() });
+}
+
+//take a todo title back out of the trash
+function restoreTitle(id) {
+  return db("todo_title").where({ id }).update({ deleted_at: null });
+}
+
+//save where a todo title's card sits on the dashboard
+function moveTitle(id, pos_x, pos_y) {
+  return db("todo_title").where({ id }).update({ pos_x, pos_y });
+}
+
+//move a todo title to another board (tab); it gets a fresh spot there
+async function moveToBoard(id, boardId) {
+  const board = await db("boards").where({ id: boardId }).first();
+  const item = await db("todo_title").where({ id }).first();
+  if (!board || !item || board.user_id !== item.user_id) return null;
+  await db("todo_title")
+    .where({ id })
+    .update({ board_id: boardId, pos_x: null, pos_y: null });
+  return findTitleById(id);
 }
 
 //create a new Note Title
@@ -45,7 +101,7 @@ function updateTitle(changes, id) {
   return db("todo_title").where({ id }).update(changes);
 }
 
-//delete todo list
+//permanently delete todo list (its notes go with it)
 
 function deleteTodoList(id) {
   return db("todo_title").del().where({ id });
