@@ -13,6 +13,7 @@ module.exports = {
   restoreTitle,
   moveTitle,
   moveToBoard,
+  resizeTitle,
 };
 
 //find all Note Titles
@@ -39,7 +40,9 @@ async function findTitleByUser(id) {
         "tt.user_id",
         "tt.pos_x",
         "tt.pos_y",
-        "tt.board_id"
+        "tt.board_id",
+        "tt.width",
+        "tt.height"
       );
     return title;
   } catch (err) {
@@ -76,6 +79,11 @@ function restoreTitle(id) {
 //save where a todo title's card sits on the dashboard
 function moveTitle(id, pos_x, pos_y) {
   return db("todo_title").where({ id }).update({ pos_x, pos_y });
+}
+
+//save how big a todo title's card is on the dashboard
+function resizeTitle(id, width, height) {
+  return db("todo_title").where({ id }).update({ width, height });
 }
 
 //move a todo title to another board (tab); it gets a fresh spot there

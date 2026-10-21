@@ -136,6 +136,23 @@ router.put("/:id/position", validateTitleID, (req, res) => {
     });
 });
 
+//save the card's size (px), kept within sensible limits
+router.put("/:id/size", validateTitleID, (req, res) => {
+  const { width, height } = req.body;
+  if (!isNum(width) || !isNum(height)) {
+    return res.status(400).json({ message: "width and height must be numbers" });
+  }
+  const w = Math.round(Math.min(Math.max(width, 240), 1200));
+  const h = Math.round(Math.min(Math.max(height, 120), 2400));
+  title
+    .resizeTitle(req.params.id, w, h)
+    .then(() => res.status(200).json({ width: w, height: h }))
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ message: "Problem saving size" });
+    });
+});
+
 //move the todo list to another board (tab)
 router.put("/:id/board", validateTitleID, (req, res) => {
   if (!Number.isInteger(req.body.board_id)) {
