@@ -1,4 +1,5 @@
 const db = require("../../../data/db-config");
+const insertId = require("../../../data/insert-id");
 
 module.exports = {
   findAllTodoList,
@@ -34,7 +35,7 @@ async function findTodoListByTitleId(id) {
 
 //create a new todo
 async function addTodoList(newTodoList) {
-  const [id] = await db("todo_list").insert(newTodoList, "id");
+  const id = await insertId("todo_list", newTodoList);
   return findTodoListById(id);
 }
 

@@ -1,4 +1,5 @@
 const db = require("../../../data/db-config");
+const insertId = require("../../../data/insert-id");
 
 module.exports = {
   find,
@@ -99,7 +100,7 @@ async function moveToBoard(id, boardId) {
 
 //create a new Note Title
 async function addTitle(newTitle) {
-  const [id] = await db("todo_title").insert(newTitle, "id");
+  const id = await insertId("todo_title", newTitle);
   return findTitleById(id);
 }
 

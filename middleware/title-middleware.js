@@ -27,8 +27,11 @@ function validateTitleID(req, res, next) {
 
 //ensuring that end points are posting the proper json information for the title
 function validateTitle(req, res, next) {
-  if (!req.body.todo_title) {
+  const name = req.body.todo_title;
+  if (!name) {
     res.status(400).json({ message: "You did not add a title" });
+  } else if (typeof name !== "string" || name.length > 128) {
+    res.status(400).json({ message: "A title can be up to 128 characters" });
   } else {
     next();
   }

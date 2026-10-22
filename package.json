@@ -20,6 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^2.0.0",
     "nodemon": "^2.0.16",
+    "pg": "^8.23.1",
     "sqlite3": "^5.0.8",
     "supertest": "^6.3.1"
   }

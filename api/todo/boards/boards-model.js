@@ -1,4 +1,5 @@
 const db = require("../../../data/db-config");
+const insertId = require("../../../data/insert-id");
 
 module.exports = {
   findBoardById,
@@ -28,7 +29,7 @@ async function findBoardsByUser(userId) {
 }
 
 async function addBoard(userId, name) {
-  const [id] = await db("boards").insert({ name, user_id: userId }, "id");
+  const id = await insertId("boards", { name, user_id: userId });
   return findBoardById(id);
 }
 

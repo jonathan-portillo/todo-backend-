@@ -1,6 +1,6 @@
 # Task Note API
 
-The REST API behind [Task Note](https://github.com/jonathan-portillo/todo-frontend-), a to-do app where each list is a card you can place, resize and organise into tabs. Built with Node, Express and Knex on SQLite.
+The REST API behind [Task Note](https://github.com/jonathan-portillo/todo-frontend-), a to-do app where each list is a card you can place, resize and organise into tabs. Built with Node, Express and Knex. It runs on Postgres in production and on a local SQLite file in development.
 
 ## Contents
 
@@ -24,7 +24,7 @@ npm install
 Create a `.env` file (see [Environment variables](#environment-variables)), then set up the database and start the server:
 
 ```
-npx knex migrate:latest     # creates / updates the SQLite database
+npx knex migrate:latest     # creates / updates the database (SQLite locally, Postgres if DATABASE_URL is set)
 npm run server              # development, restarts on changes (nodemon)
 npm start                   # plain node
 ```
@@ -42,7 +42,8 @@ The frontend expects the API on port **4000**, so use `PORT=4000` for local deve
 | `PORT`          | yes      | none                   | Port the server listens on.                         |
 | `JWT_SECRET`    | no       | a built-in dev secret  | Secret used to sign login tokens. Set your own in production. |
 | `BCRYPT_ROUNDS` | no       | `8`                    | Password hashing cost.                              |
-| `DB_ENV`        | no       | `development`          | Which `knexfile.js` environment to use.             |
+| `DATABASE_URL`  | in production | none              | Postgres connection string. When set, the app uses Postgres; when empty it uses the local SQLite file `data/todo_list.db3`. |
+| `DATABASE_SSL`  | no       | on                     | Set to `off` for a Postgres without TLS (for example one running on your own machine). Hosted databases such as Neon need it on. |
 
 ## How the data fits together
 
@@ -182,7 +183,8 @@ Tokens last one day.
 - **Routes are not protected by the login token.** Tokens are issued, but the other endpoints do not check them yet, and the user id comes from the URL. This is fine for a personal project, but it needs middleware before real use.
 - **`GET /title` and `GET /users` list data for every account.**
 - **`npm test`** is not wired up yet (`___test___/` has a starting Jest file).
-- **`data/todo_list.db3`** is the local development database and is tracked in git. Local runs change it, so avoid committing it with real accounts in it.
+- **`data/todo_list.db3`** is the local development database. It is not tracked in git, so a fresh clone starts empty after `npx knex migrate:latest`.
+- **Production needs `DATABASE_URL`** (and `JWT_SECRET`; the server refuses to start in production without it). Use a Postgres that keeps its data between deploys, such as Neon. A free web host's local disk is wiped on every deploy, so SQLite there loses all accounts.
 
 ## History
 

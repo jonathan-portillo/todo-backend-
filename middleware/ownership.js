@@ -12,7 +12,13 @@ function ownUserParam(req, res, next) {
   next();
 }
 
+// Postgres rejects ids that aren't plain integers, so check before querying
+const isId = (id) => /^\d{1,9}$/.test(String(id));
+
 const owns = (findOwnerId) => async (req, res, next) => {
+  if (!isId(req.params.id)) {
+    return res.status(404).json({ message: "Not found." });
+  }
   try {
     const ownerId = await findOwnerId(req.params.id);
     if (ownerId == null || String(ownerId) !== String(req.user.id)) {

@@ -1,4 +1,5 @@
 const db = require("../../../data/db-config");
+const insertId = require("../../../data/insert-id");
 
 module.exports = {
   find,
@@ -34,7 +35,7 @@ function findDescriptionById(id) {
 
 //add a new description
 async function addDescription(newDescription) {
-  const [id] = await db("description").insert(newDescription, "id");
+  const id = await insertId("description", newDescription);
   return findDescriptionById(id);
 }
 
