@@ -4,27 +4,16 @@ const {
   validateTitleID,
   validateTitle,
 } = require("../../../middleware/title-middleware");
+const { ownUserParam, ownTitle } = require("../../../middleware/ownership");
+const boards = require("../boards/boards-model");
 
 // x can be negative: cards may sit left of the dashboard column. y starts at the top.
 const isNum = (n) => typeof n === "number" && Number.isFinite(n);
 const isCoordX = isNum;
 const isCoordY = (n) => isNum(n) && n >= 0;
 
-//get every single todo title created!!
-router.get("/", (req, res) => {
-  title
-    .find()
-    .then((title) => {
-      res.status(200).json(title);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.send(err);
-    });
-});
-
 //get todo title based on user_id
-router.get("/user/:id", (req, res) => {
+router.get("/user/:id", ownUserParam, (req, res) => {
   title
     .findTitleByUser(req.params.id)
     .then((userTitle) => {
@@ -37,7 +26,7 @@ router.get("/user/:id", (req, res) => {
 });
 
 //get the trashed todo titles for a user
-router.get("/user/:id/trash", (req, res) => {
+router.get("/user/:id/trash", ownUserParam, (req, res) => {
   title
     .findTrashByUser(req.params.id)
     .then((trash) => {
@@ -50,7 +39,7 @@ router.get("/user/:id/trash", (req, res) => {
 });
 
 //get todo based on titleid
-router.get("/:id", validateTitleID, (req, res) => {
+router.get("/:id", ownTitle, validateTitleID, (req, res) => {
   const titleId = req.params.id;
   title
     .findTitleById(titleId)
@@ -63,12 +52,16 @@ router.get("/:id", validateTitleID, (req, res) => {
 });
 
 //create a todo list that is tied to the user_id
-router.post("/user/:id/", validateTitle, (req, res) => {
+router.post("/user/:id/", ownUserParam, validateTitle, async (req, res) => {
   const newTodoTitle = {
     user_id: req.params.id,
     todo_title: req.body.todo_title,
   };
   if (Number.isInteger(req.body.board_id)) {
+    const board = await boards.findBoardById(req.body.board_id);
+    if (!board || String(board.user_id) !== String(req.user.id)) {
+      return res.status(400).json({ message: "That board isn't yours" });
+    }
     newTodoTitle.board_id = req.body.board_id;
   }
   if (isCoordX(req.body.pos_x) && isCoordY(req.body.pos_y)) {
@@ -88,12 +81,12 @@ router.post("/user/:id/", validateTitle, (req, res) => {
 
 //update the todo list title
 
-router.put("/:id", validateTitleID, validateTitle, (req, res) => {
+router.put("/:id", ownTitle, validateTitleID, validateTitle, (req, res) => {
   const updatedTitle = {
     todo_title: req.body.todo_title,
   };
   title
-    .updateTitle(req.body, req.params.id)
+    .updateTitle(updatedTitle, req.params.id)
     .then(() => {
       res.status(201).json({
         message: `Your new Title is updated `,
@@ -107,7 +100,7 @@ router.put("/:id", validateTitleID, validateTitle, (req, res) => {
 });
 
 //move the todo list to the trash
-router.delete("/:id", validateTitleID, (req, res) => {
+router.delete("/:id", ownTitle, validateTitleID, (req, res) => {
   title
     .trashTitle(req.params.id)
     .then(() => {
@@ -120,7 +113,7 @@ router.delete("/:id", validateTitleID, (req, res) => {
 });
 
 //save where the todo list's card sits on the dashboard
-router.put("/:id/position", validateTitleID, (req, res) => {
+router.put("/:id/position", ownTitle, validateTitleID, (req, res) => {
   const { pos_x, pos_y } = req.body;
   if (!isCoordX(pos_x) || !isCoordY(pos_y)) {
     return res.status(400).json({ message: "pos_x and pos_y must be numbers" });
@@ -137,7 +130,7 @@ router.put("/:id/position", validateTitleID, (req, res) => {
 });
 
 //save the card's size (px), kept within sensible limits
-router.put("/:id/size", validateTitleID, (req, res) => {
+router.put("/:id/size", ownTitle, validateTitleID, (req, res) => {
   const { width, height } = req.body;
   if (!isNum(width) || !isNum(height)) {
     return res.status(400).json({ message: "width and height must be numbers" });
@@ -154,7 +147,7 @@ router.put("/:id/size", validateTitleID, (req, res) => {
 });
 
 //move the todo list to another board (tab)
-router.put("/:id/board", validateTitleID, (req, res) => {
+router.put("/:id/board", ownTitle, validateTitleID, (req, res) => {
   if (!Number.isInteger(req.body.board_id)) {
     return res.status(400).json({ message: "board_id must be a number" });
   }
@@ -173,7 +166,7 @@ router.put("/:id/board", validateTitleID, (req, res) => {
 });
 
 //restore a todo list from the trash
-router.put("/:id/restore", validateTitleID, (req, res) => {
+router.put("/:id/restore", ownTitle, validateTitleID, (req, res) => {
   title
     .restoreTitle(req.params.id)
     .then(() => title.findTitleById(req.params.id))
@@ -187,7 +180,7 @@ router.put("/:id/restore", validateTitleID, (req, res) => {
 });
 
 //permanently delete a todo list
-router.delete("/:id/permanent", validateTitleID, (req, res) => {
+router.delete("/:id/permanent", ownTitle, validateTitleID, (req, res) => {
   title
     .deleteTodoList(req.params.id)
     .then(() => {

@@ -2,8 +2,8 @@ const express = require("express");
 const server = express();
 const cors = require("cors");
 
-const usersRouter = require("./users/users-router");
 const authRouter = require("../auth/auth-router");
+const restricted = require("../middleware/restricted");
 const titleRouter = require("../api/todo/todo-title/todo_title-router");
 const boardsRouter = require("../api/todo/boards/boards-router");
 const todoListRouter = require("../api/todo/toto-list/todo_list_router");
@@ -13,11 +13,11 @@ server.use(express.json());
 server.use(cors());
 
 server.use("/auth", authRouter);
-server.use("/users", usersRouter);
-server.use("/title", titleRouter);
-server.use("/boards", boardsRouter);
-server.use("/todoList", todoListRouter);
-server.use("/description", descriptionRouter);
+// everything below needs a signed-in user
+server.use("/title", restricted, titleRouter);
+server.use("/boards", restricted, boardsRouter);
+server.use("/todoList", restricted, todoListRouter);
+server.use("/description", restricted, descriptionRouter);
 
 server.get("/", (req, res) => {
   res.json({ api: "server is up" });

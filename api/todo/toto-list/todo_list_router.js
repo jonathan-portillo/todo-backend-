@@ -6,22 +6,10 @@ const {
   validateTodoInList,
 } = require("../../../middleware/todo-middleware");
 const { validateTitleID } = require("../../../middleware/title-middleware");
-
-//get an entire list of all todoLists on the site
-router.get("/", (req, res) => {
-  todoList
-    .findAllTodoList()
-    .then((todoList) => {
-      res.status(200).json(todoList);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.send(err);
-    });
-});
+const { ownTitle, ownTodo } = require("../../../middleware/ownership");
 
 //list on todo's id
-router.get("/:id", validateTodoID, (req, res) => {
+router.get("/:id", ownTodo, validateTodoID, (req, res) => {
   const todoListId = req.params.id;
   todoList
     .findTodoListById(todoListId)
@@ -34,7 +22,7 @@ router.get("/:id", validateTodoID, (req, res) => {
 });
 
 //list of todo's based on titleid
-router.get("/:id/title", validateTitleID, validateTodoInList, (req, res) => {
+router.get("/:id/title", ownTitle, validateTitleID, validateTodoInList, (req, res) => {
   todoList
     .findTodoListByTitleId(req.params.id)
     .then((title) => {
@@ -47,7 +35,7 @@ router.get("/:id/title", validateTitleID, validateTodoInList, (req, res) => {
 });
 
 //create a todo list that is tied to the todoTitle_id
-router.post("/:id/title", validateTodo, validateTitleID, (req, res) => {
+router.post("/:id/title", ownTitle, validateTodo, validateTitleID, (req, res) => {
   const newTodoList = {
     todo_title_id: req.params.id,
     todo_list: req.body.todo_list,
@@ -67,12 +55,12 @@ router.post("/:id/title", validateTodo, validateTitleID, (req, res) => {
 });
 
 //update todo list
-router.put("/:id", validateTodo, validateTodoID, (req, res) => {
+router.put("/:id", ownTodo, validateTodo, validateTodoID, (req, res) => {
   const updatedTodoList = {
     todo_list: req.body.todo_list,
   };
   todoList
-    .updateTodoList(req.body, req.params.id)
+    .updateTodoList(updatedTodoList, req.params.id)
     .then(() => {
       res.status(201).json({
         message: `Your todo list has been updated`,
@@ -85,7 +73,7 @@ router.put("/:id", validateTodo, validateTodoID, (req, res) => {
     });
 });
 
-router.delete("/:id", validateTodoID, (req, res) => {
+router.delete("/:id", ownTodo, validateTodoID, (req, res) => {
   todoList.deleteTodo(req.params.id).then(() => {
     res.status(200).json({ message: "Your to do has been deleted" });
   });

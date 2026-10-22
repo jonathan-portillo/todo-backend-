@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const boards = require("./boards-model");
+const { ownUserParam, ownBoard } = require("../../../middleware/ownership");
 
 const cleanName = (name) =>
   typeof name === "string" ? name.trim().slice(0, 64) : "";
@@ -19,7 +20,7 @@ const validateBoardID = (req, res, next) => {
 };
 
 //get the boards (tabs) for a user
-router.get("/user/:id", (req, res) => {
+router.get("/user/:id", ownUserParam, (req, res) => {
   boards
     .findBoardsByUser(req.params.id)
     .then((list) => res.status(200).json(list))
@@ -30,7 +31,7 @@ router.get("/user/:id", (req, res) => {
 });
 
 //create a board for a user
-router.post("/user/:id", (req, res) => {
+router.post("/user/:id", ownUserParam, (req, res) => {
   const name = cleanName(req.body.name);
   if (!name) return res.status(400).json({ message: "A board needs a name" });
   boards
@@ -43,7 +44,7 @@ router.post("/user/:id", (req, res) => {
 });
 
 //rename a board
-router.put("/:id", validateBoardID, (req, res) => {
+router.put("/:id", ownBoard, validateBoardID, (req, res) => {
   const name = cleanName(req.body.name);
   if (!name) return res.status(400).json({ message: "A board needs a name" });
   boards
@@ -56,7 +57,7 @@ router.put("/:id", validateBoardID, (req, res) => {
 });
 
 //delete a board; its lists go to the trash. The last board can't be deleted.
-router.delete("/:id", validateBoardID, async (req, res) => {
+router.delete("/:id", ownBoard, validateBoardID, async (req, res) => {
   try {
     const all = await boards.findBoardsByUser(req.board.user_id);
     if (all.length <= 1) {

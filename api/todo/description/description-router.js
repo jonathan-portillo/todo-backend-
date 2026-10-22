@@ -6,23 +6,12 @@ const {
   validateDescriptionsForTodo,
 } = require("../../../middleware/description-middleware");
 const { validateTodoID } = require("../../../middleware/todo-middleware");
-
-//get a list of every single description
-router.get("/", (req, res) => {
-  description
-    .find()
-    .then((description) => {
-      res.status(200).json(description);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.send(err);
-    });
-});
+const { ownTodo, ownDescription } = require("../../../middleware/ownership");
 
 //find description from todo list id
 router.get(
   "/:id/list",
+  ownTodo,
   validateTodoID,
   validateDescriptionsForTodo,
   (req, res) => {
@@ -39,7 +28,7 @@ router.get(
 );
 
 //get description by id
-router.get("/:id", validateDescriptionID, (req, res) => {
+router.get("/:id", ownDescription, validateDescriptionID, (req, res) => {
   const descripId = req.params.id;
   description
     .findDescriptionById(descripId)
@@ -53,7 +42,7 @@ router.get("/:id", validateDescriptionID, (req, res) => {
 });
 
 //post a description for a todo
-router.post("/:id/list", validateDescription, validateTodoID, (req, res) => {
+router.post("/:id/list", ownTodo, validateDescription, validateTodoID, (req, res) => {
   const newDescription = {
     todo_list_id: req.params.id,
     description: req.body.description,
@@ -72,12 +61,12 @@ router.post("/:id/list", validateDescription, validateTodoID, (req, res) => {
 });
 
 //update our description
-router.put("/:id", validateDescriptionID, validateDescription, (req, res) => {
+router.put("/:id", ownDescription, validateDescriptionID, validateDescription, (req, res) => {
   const update = {
     description: req.body.description,
   };
   description
-    .updateDescription(req.body, req.params.id)
+    .updateDescription(update, req.params.id)
     .then(() => {
       res.status(201).json({
         message: "Description updated",
@@ -91,7 +80,7 @@ router.put("/:id", validateDescriptionID, validateDescription, (req, res) => {
 });
 
 //delete our description
-router.delete("/:id", validateDescriptionID, (req, res) => {
+router.delete("/:id", ownDescription, validateDescriptionID, (req, res) => {
   description.deleteDescription(req.params.id).then(() => {
     res.status(200).json({ message: "You have deleted your description" });
   });
