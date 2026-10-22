@@ -43,6 +43,9 @@ The frontend expects the API on port **4000**, so use `PORT=4000` for local deve
 | `JWT_SECRET`    | no       | a built-in dev secret  | Secret used to sign login tokens. Set your own in production. |
 | `BCRYPT_ROUNDS` | no       | `8`                    | Password hashing cost.                              |
 | `DATABASE_URL`  | in production | none              | Postgres connection string. When set, the app uses Postgres; when empty it uses the local SQLite file `data/todo_list.db3`. |
+| `RESEND_API_KEY`| for email | none                  | Resend API key used to send confirmation and reset emails. Without it, emails are printed to the server console instead. |
+| `MAIL_FROM`     | no       | `Task Note <onboarding@resend.dev>` | The sender. Resend only lets the default address send to your own account email; to email anyone else, verify a domain in Resend and use an address on it. |
+| `APP_URL`       | for email | `http://localhost:3000` | The frontend's address, used to build the links in emails. |
 | `DATABASE_SSL`  | no       | on                     | Set to `off` for a Postgres without TLS (for example one running on your own machine). Hosted databases such as Neon need it on. |
 
 ## How the data fits together
@@ -54,7 +57,8 @@ users ──< boards ──< todo_title ──< todo_list
 
 | Table        | Columns                                                                                                    |
 | :----------- | :--------------------------------------------------------------------------------------------------------- |
-| `users`      | `id`, `username` (unique), `password` (bcrypt hash)                                                        |
+| `users`      | `id`, `username` (unique), `password` (bcrypt hash), `email` (unique, only once confirmed)                  |
+| `email_tokens` | `id`, `user_id`, `type` (`verify` or `reset`), `token_hash`, `new_email`, `expires_at`, `used_at`, `created_at` |
 | `boards`     | `id`, `name`, `user_id`                                                                                    |
 | `todo_title` | `id`, `todo_title`, `user_id`, `board_id`, `pos_x`, `pos_y`, `width`, `height`, `deleted_at`               |
 | `todo_list`  | `id`, `todo_list` (text), `todo_title_id`                                                                  |
@@ -81,12 +85,23 @@ All request and response bodies are JSON.
 
 ### Auth and users
 
-| Action               | URL              | Method | Body                          |
-| :------------------- | :--------------- | :----- | :---------------------------- |
-| Reach the API        | `/`              | GET    |                               |
-| Register a user      | `/auth/register` | POST   | `{ username, password }`      |
-| Log in               | `/auth/login`    | POST   | `{ username, password }`      |
-| List users           | `/users`         | GET    |                               |
+Every route except `/`, `/auth/register`, `/auth/login`, `/auth/forgot-password`, `/auth/reset-password` and `/auth/verify-email` needs the login token in the `Authorization` header, and only reaches the signed-in user's own records.
+
+| Action                  | URL                     | Method | Body                                  | Token |
+| :---------------------- | :---------------------- | :----- | :------------------------------------ | :---- |
+| Reach the API           | `/`                     | GET    |                                       | no    |
+| Register a user         | `/auth/register`        | POST   | `{ username, password, email? }`      | no    |
+| Log in                  | `/auth/login`           | POST   | `{ username, password }`              | no    |
+| Who am I                | `/auth/me`              | GET    |                                       | yes   |
+| Change username         | `/auth/username`        | PUT    | `{ newUsername, password }`           | yes   |
+| Change password         | `/auth/password`        | PUT    | `{ currentPassword, newPassword }`    | yes   |
+| Add or change email     | `/auth/email`           | PUT    | `{ email, password }` (sends a confirmation link) | yes |
+| Remove email            | `/auth/email`           | DELETE | `{ password }`                        | yes   |
+| Confirm an email        | `/auth/verify-email`    | POST   | `{ token }` (from the emailed link)   | no    |
+| Ask for a reset link    | `/auth/forgot-password` | POST   | `{ identifier }` (username or email)  | no    |
+| Set a new password      | `/auth/reset-password`  | POST   | `{ token, newPassword }`              | no    |
+
+An email only counts once its link is clicked, and only a confirmed email receives reset links. Reset links last one hour and work once; confirmation links last 24 hours. Tokens are stored hashed. `/auth/forgot-password` always gives the same answer, whether or not the account exists. Login, sign-up and the email and reset routes are rate limited per client address.
 
 ### Boards (the tabs)
 

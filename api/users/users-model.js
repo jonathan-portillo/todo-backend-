@@ -7,6 +7,7 @@ module.exports = {
   findById,
   add,
   update,
+  findByEmail,
 };
 
 async function find() {
@@ -29,4 +30,8 @@ async function add(user) {
 // changes can be { username } or { password }
 function update(id, changes) {
   return db("users").where({ id }).update(changes);
+}
+
+function findByEmail(email) {
+  return db("users").where({ email }).first();
 }

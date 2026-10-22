@@ -9,6 +9,9 @@ const boardsRouter = require("../api/todo/boards/boards-router");
 const todoListRouter = require("../api/todo/toto-list/todo_list_router");
 const descriptionRouter = require("../api/todo/description/description-router");
 
+// behind the host's proxy, so rate limits see the real client address
+server.set("trust proxy", 1);
+
 server.use(express.json());
 server.use(cors());
 
