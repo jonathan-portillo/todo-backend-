@@ -5,6 +5,7 @@ module.exports = {
   findBy,
   findById,
   add,
+  update,
 };
 
 async function find() {
@@ -22,4 +23,9 @@ function findById(id) {
 async function add(user) {
   const [id] = await db("users").insert(user, "id");
   return findById(id);
+}
+
+// changes can be { username } or { password }
+function update(id, changes) {
+  return db("users").where({ id }).update(changes);
 }
